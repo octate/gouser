@@ -14,6 +14,7 @@ import (
 var Module = fx.Options(
 	fx.Provide(
 		newLogger,
+		InitLogrus,
 	),
 	fx.Invoke(
 		LivenessProbe,

@@ -29,11 +29,11 @@ func New() (config *viper.Viper) {
 			desc:       "Environment",
 		},
 		"postgresql_db": {
-			defaultVal: "user",
+			defaultVal: "gouser",
 			desc:       "Postgresql db name",
 		},
 		"postgresql_host": {
-			defaultVal: "localhost",
+			defaultVal: "127.0.0.1",
 			desc:       "Postgresql host",
 		},
 		"postgresql_port": {
@@ -41,11 +41,11 @@ func New() (config *viper.Viper) {
 			desc:       "Postgresql port",
 		},
 		"postgresql_user": {
-			defaultVal: "postgres",
+			defaultVal: "princeraj",
 			desc:       "Postgresql username",
 		},
 		"postgresql_password": {
-			defaultVal: "",
+			defaultVal: "admin",
 			desc:       "Postgresql password",
 		},
 		"port": {

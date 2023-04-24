@@ -5,12 +5,12 @@ import (
 	"gouser/er"
 	"net/http"
 
-	"go.uber.org/zap"
-
+	"github.com/getsentry/sentry-go"
 	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 )
 
-func ErrorHandlerX(log *zap.Logger) gin.HandlerFunc {
+func ErrorHandlerX(log *logrus.Logger) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		defer func() {
 			err := c.Errors.Last()
@@ -19,15 +19,20 @@ func ErrorHandlerX(log *zap.Logger) gin.HandlerFunc {
 				return
 			}
 
-			log.Error(err.Err.Error())
-
 			e := er.From(err.Err)
+
+			if !e.NOP {
+				sentry.CaptureException(e)
+			}
+
 			httpStatus := http.StatusInternalServerError
 			if e.Status > 0 {
 				httpStatus = e.Status
 			}
+
 			c.JSON(httpStatus, e)
 		}()
+
 		c.Next()
 	}
 }

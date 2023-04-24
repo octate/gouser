@@ -3,12 +3,13 @@ package er
 var messages = map[string]string{
 	"1": "Oops! Something went wrong. Please try later",
 
-	"100": "Invalid Application ID or token",
+	"422": "Request not valid",
+	"423": "User already exists",
 }
 
 var codes = map[Code]string{
 	UncaughtException: "1",
 
-	InvalidAppToken: "100",
-	UserNotPresent:  "201",
+	InvalidRequestBody: "422",
+	UserAlreadyExists:  "423",
 }

@@ -9,21 +9,17 @@ func _() {
 	// Re-run the stringer command to generate them again.
 	var x [1]struct{}
 	_ = x[UncaughtException-0]
+	_ = x[InvalidRequestBody-1]
+	_ = x[UserAlreadyExists-2]
 }
 
-const (
-	_Code_name_0 = "UncaughtException"
-)
+const _Code_name = "UncaughtExceptionInvalidRequestBodyUserAlreadyExists"
 
-var (
-	_Code_index_0 = [...]uint16{0}
-)
+var _Code_index = [...]uint8{0, 17, 35, 52}
 
 func (i Code) String() string {
-	switch {
-	case 0 <= i && i <= 17:
-		return _Code_name_0[_Code_index_0[i]:_Code_index_0[i+1]]
-	default:
+	if i < 0 || i >= Code(len(_Code_index)-1) {
 		return "Code(" + strconv.FormatInt(int64(i), 10) + ")"
 	}
+	return _Code_name[_Code_index[i]:_Code_index[i+1]]
 }

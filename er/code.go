@@ -7,10 +7,6 @@ type Code int
 // Generic exceptions
 const (
 	UncaughtException Code = iota // 0
-	InvalidAppToken
-)
-
-// Middleware exceptions
-const (
-	UserNotPresent Code = iota + 101
+	InvalidRequestBody
+	UserAlreadyExists
 )

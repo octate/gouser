@@ -1,16 +1,16 @@
 package server
 
 import (
-	"database/sql"
 	"fmt"
+	"gouser/internal/server/handler"
 	"net/http"
-	"time"
 
-	ginzap "github.com/gin-contrib/zap"
 	"github.com/gin-gonic/gin"
+	"github.com/go-pg/pg/v10"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
+	ginlogrus "github.com/toorop/gin-logrus"
 	"go.uber.org/fx"
-	"go.uber.org/zap"
 )
 
 // Module invokes mainserver
@@ -29,9 +29,11 @@ type Options struct {
 	fx.In
 
 	Config *viper.Viper
-	Log    *zap.Logger
+	Log    *logrus.Logger
 
-	PostgresDB *sql.DB `name:"userDB"`
+	PostgresDB *pg.DB `name:"gouserDB"`
+
+	UserHandler *handler.UserHandler
 }
 
 // Run starts the mainserver REST API server
@@ -51,22 +53,15 @@ func SetupRouter(o *Options) (router *gin.Engine) {
 	//   - Logs all requests, like a combined access and error log.
 	//   - Logs to stdout.
 	//   - RFC3339 with UTC time format.
-	router.Use(ginzap.Ginzap(o.Log, time.RFC3339, false))
 
 	// Logs all panic to error log
-	// stack means whether output the stack info.
-	router.Use(ginzap.RecoveryWithZap(o.Log, true))
+	router.Use(ginlogrus.Logger(o.Log), gin.Recovery())
 
-	// router.Use(gin.LoggerWithConfig(gin.LoggerConfig{
-	// 	SkipPaths: []string{"/_healthz", "/_readyz"},
-	// }))
-
-	// Health routes. DO NOT MOVE IT FROM HERE!
+	// Health routes
 	router.GET("/_healthz", HealthHandler(o))
 	router.GET("/_readyz", HealthHandler(o))
 
 	rootRouter := router.Group("/")
-	rootRoutes(rootRouter, o)
 
 	v1Routes(rootRouter, o)
 
@@ -77,7 +72,7 @@ func SetupRouter(o *Options) (router *gin.Engine) {
 func HealthHandler(o *Options) func(*gin.Context) {
 	return func(c *gin.Context) {
 		var err error
-		err = o.PostgresDB.Ping()
+		err = o.PostgresDB.Ping(c)
 		if err != nil {
 			c.AbortWithError(http.StatusFailedDependency, err)
 			return
